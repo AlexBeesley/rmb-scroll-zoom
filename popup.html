@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RMB Scroll Zoom Settings</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="title-group">
+        <img src="icons/icon-48.png" alt="RMB Scroll Zoom Icon" class="logo">
+        <div>
+          <h1 class="title">RMB Scroll Zoom</h1>
+          <span class="badge">v1.1.0</span>
+        </div>
+      </div>
+      <label class="switch" title="Enable/Disable extension">
+        <input type="checkbox" id="ext-enabled" checked>
+        <span class="slider"></span>
+      </label>
+    </header>
+
+    <!-- Live Tab Zoom Card -->
+    <section class="card zoom-card">
+      <div class="zoom-header">
+        <span class="card-label">Current Tab Zoom</span>
+        <span class="zoom-value" id="current-zoom">100%</span>
+      </div>
+      <div class="zoom-controls">
+        <button type="button" class="btn btn-secondary" id="btn-zoom-out" title="Zoom Out (Ctrl -)">
+          <svg viewBox="0 0 24 24" class="btn-icon"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+        <button type="button" class="btn btn-primary" id="btn-zoom-reset" title="Reset Zoom to 100%">
+          Reset (100%)
+        </button>
+        <button type="button" class="btn btn-secondary" id="btn-zoom-in" title="Zoom In (Ctrl +)">
+          <svg viewBox="0 0 24 24" class="btn-icon"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Quick Help Card -->
+    <section class="card hint-card">
+      <div class="gesture-row">
+        <span class="key-pill">RMB</span> + <span class="key-pill">Scroll</span>
+        <span class="gesture-desc">Zoom in / out</span>
+      </div>
+      <div class="gesture-row" id="reset-hint-row">
+        <span class="key-pill">RMB</span> + <span class="key-pill" id="reset-key-label">LMB</span>
+        <span class="gesture-desc">Reset to 100%</span>
+      </div>
+    </section>
+
+    <!-- Settings -->
+    <div class="settings-list">
+      <!-- Zoom Scope -->
+      <div class="setting-item">
+        <div class="setting-text">
+          <label for="zoom-scope" class="setting-title">Zoom Applies To</label>
+          <span class="setting-subtitle" id="zoom-scope-subtitle">This tab only</span>
+        </div>
+        <select id="zoom-scope" class="select-input">
+          <option value="per-tab">This tab only</option>
+          <option value="per-origin">All tabs on the site</option>
+        </select>
+      </div>
+
+      <!-- Restore After Reload (only meaningful for per-tab scope) -->
+      <div class="setting-item" id="restore-reload-row">
+        <div class="setting-text">
+          <label for="restore-on-reload" class="setting-title">Keep Zoom On Reload</label>
+          <span class="setting-subtitle">Re-apply this tab's zoom after navigating</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="restore-on-reload" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <!-- Step Mode -->
+      <div class="setting-item">
+        <div class="setting-text">
+          <label for="step-mode" class="setting-title">Zoom Steps</label>
+          <span class="setting-subtitle">Step calculation method</span>
+        </div>
+        <select id="step-mode" class="select-input">
+          <option value="preset">Chrome Presets (25% - 500%)</option>
+          <option value="linear">Custom Linear %</option>
+        </select>
+      </div>
+
+      <!-- Linear Step Size (conditionally visible) -->
+      <div class="setting-item" id="linear-step-row" style="display: none;">
+        <div class="setting-text">
+          <label for="linear-step" class="setting-title">Step Size</label>
+          <span class="setting-subtitle">Zoom increment per notch</span>
+        </div>
+        <select id="linear-step" class="select-input">
+          <option value="5">5%</option>
+          <option value="10" selected>10%</option>
+          <option value="15">15%</option>
+          <option value="20">20%</option>
+          <option value="25">25%</option>
+        </select>
+      </div>
+
+      <!-- Invert Scroll -->
+      <div class="setting-item">
+        <div class="setting-text">
+          <label for="invert-direction" class="setting-title">Invert Scroll</label>
+          <span class="setting-subtitle">Scroll down to zoom in</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="invert-direction">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <!-- Reset Gesture -->
+      <div class="setting-item">
+        <div class="setting-text">
+          <label for="reset-gesture" class="setting-title">Instant Reset Gesture</label>
+          <span class="setting-subtitle">While holding Right Button</span>
+        </div>
+        <select id="reset-gesture" class="select-input">
+          <option value="rmb_left">Click Left Button</option>
+          <option value="rmb_middle">Click Middle Button</option>
+          <option value="disabled">Disabled</option>
+        </select>
+      </div>
+
+      <!-- Show HUD -->
+      <div class="setting-item">
+        <div class="setting-text">
+          <label for="show-hud" class="setting-title">On-screen HUD</label>
+          <span class="setting-subtitle">Display floating zoom badge</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="show-hud" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <!-- HUD Duration -->
+      <div class="setting-item" id="hud-duration-row">
+        <div class="setting-text">
+          <label for="hud-duration" class="setting-title">HUD Duration</label>
+          <span class="setting-subtitle">How long badge stays visible</span>
+        </div>
+        <select id="hud-duration" class="select-input">
+          <option value="800">0.8 seconds</option>
+          <option value="1200" selected>1.2 seconds</option>
+          <option value="2000">2.0 seconds</option>
+          <option value="3000">3.0 seconds</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Footer Status -->
+    <footer class="footer">
+      <span id="save-status" class="save-status">Settings saved automatically</span>
+      <button type="button" class="link-button" id="btn-zoom-levels" title="Chrome keeps a saved zoom level per site; clear old entries here">
+        Clear saved site zoom levels
+      </button>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+@echo off
+echo Starting Google Chrome with RMB Scroll Zoom loaded...
+start "" "C:\Program Files\Google\Chrome\Application\chrome.exe" --load-extension="%~dp0\" --user-data-dir="%TEMP%\chrome-rmb-zoom-test" "https://en.wikipedia.org"
